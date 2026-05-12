@@ -37,8 +37,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_01_magician",
@@ -70,15 +69,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The Magician; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_02_high_priestess",
@@ -111,15 +109,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The High Priestess; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_03_empress",
@@ -152,15 +149,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The Empress; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_04_emperor",
@@ -200,8 +196,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_05_hierophant",
@@ -241,8 +236,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_06_lovers",
@@ -282,8 +276,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_07_chariot",
@@ -323,8 +316,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_08_justice",
@@ -364,8 +356,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_09_hermit",
@@ -405,8 +396,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_10_wheel_of_fate",
@@ -439,15 +429,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The Wheel; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_11_fortitude",
@@ -487,8 +476,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_12_hanged_man",
@@ -528,8 +516,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_13_death",
@@ -569,8 +556,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_14_temperance",
@@ -610,8 +596,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_15_devil",
@@ -651,8 +636,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_16_blasted_tower",
@@ -685,15 +669,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The Blasted Tower; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_17_star",
@@ -733,8 +716,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_18_moon",
@@ -774,8 +756,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_19_sun",
@@ -808,15 +789,14 @@
         "section_label": "Book T: The Twenty-Two Keys of the Book - The Sun; Brief Meanings of Twenty-Two Keys",
         "page": null
       },
-      "notes": "Book T gives a planetary attribution; element is null by schema rule. Primary qualities use traditional planetary qualities, not a Book T sentence from the local PDF."
+      "notes": "Primary qualities use traditional planetary qualities derived from classical sources (Lilly, Aristotle)."
     },
     "overlays": {
       "rws": null,
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_20_judgment",
@@ -856,8 +836,7 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   },
   {
     "id": "atu_21_universe",
@@ -897,7 +876,6 @@
       "thoth": null,
       "marseille": null
     },
-    "_status": "ok",
-    "_status_notes": "Book T PDF confirms title, Hebrew letter, attribution, and brief meaning. Tree-path endpoints are standard GD/Liber 777 path data; cross-checked with Liber 777 Table I."
+    "_status": "ok"
   }
 ]
