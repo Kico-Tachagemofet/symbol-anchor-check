@@ -119,6 +119,21 @@ Evidence:
   - card: Death, layer: sephira_layer, quote: "links Tiphareth to Netzach"
 ```
 
+### Reversed Card Elimination Ban (R0)
+
+A reversed card does NOT negate its upright property. Phase 3's dignity_layer already states that a reversed card means "the same energy expressed through its negative form: repression, immaturity, or an out-of-control variant" — same energy, different expression, not energy vanishing.
+
+In the elimination step, **it is forbidden to eliminate a structural candidate supported by the upright property solely because "the card is reversed."**
+
+| Upright | Reversed Does NOT Mean |
+|---------|----------------------|
+| 9 of Wands: tense vigilance, steady force under tension | strength gone, no vigilance |
+| Queen: outward care/nurturing | no care, nurturing vanished |
+| Magician: skill/will/channel flowing | no skill, will absent |
+| World: completion, cycle closed | nothing was completed |
+
+Correct elimination for reversed cards: retain the upright property base (strength/care/flow/completion), **eliminate the candidate where "the property operates in a full, outward, frictionless manner."** A reversed card turns the same property inward, holds it back, or routes it through a less visible path — but the property itself did not evaporate.
+
 ### Fixed Unknowns
 
 A 6-position spirit communication spread maps to the following unknowns:
