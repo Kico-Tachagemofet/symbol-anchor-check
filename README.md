@@ -1,80 +1,104 @@
-# Symbol Anchor Check v4 — Deterministic Property Anchoring + Via Negativa
+# Symbol Anchor Check v4
 
-一套用于 tarot 解读的**属性一致性核查器**。不查"牌意"，只查属性。
+Tarot 解读属性校验 Skill。它用 Golden Dawn / Book T 的属性层检查一段塔罗解读是否站得住：元素、源质、旬星、尊贵状态、路径、宫廷牌跨度和牌位必须共同支持解读方向。
 
-## 核心理念
+核心在于：先查硬属性，再收束解读。它适合放在抽牌结果和最终解释之间，做一次属性一致性检查。
 
-**事件才是模型，牌是事件的投影。**
+## 适合谁
 
-传统的 tarot 解读倾向于"检索牌意"——看到权杖五就想到"冲突"，看到圣杯二就想到"恋爱"。这个 skill 拒绝这种工作方式。
+- 已经拿到塔罗牌阵，希望检查解读有没有顺着牌名套话。
+- 使用 AI Agent 解读塔罗，想减少“看到权杖五就写冲突”这类检索式输出。
+- 日常使用 `spirit-communication-system v5.1 Lite` 抽取原始结果，再对塔罗部分做后处理。
+- 想把 Book T 属性体系变成可执行的 Agent Skill。
 
-v4.0 的做法分两阶段：
+## 它做什么
 
-**Phase 3 — 确定性属性展开**：`phase3_unfold.py` 脚本（不走 LLM）将每张牌展开为 Book T 五层属性（元素/源质/旬星/尊贵/位置）+ compound_image + spread_synthesis。
+Symbol Anchor Check 不负责抽牌。它负责在已有牌阵和已有问题语境上做校验：
 
-**Phase 4 — Via Negativa 收束**：LLM 在 Phase 3 的属性材料上做五步收束——(1) 排除不支持的候选，引原文为证、(2) narrowed_field 纯属性语言、(3) 跨符号校验（易经/骰子/字卡）、(4) answer 说场景不说牌、(5) open_threads 保留未覆盖项。
+1. 把牌名映射到 `data/tarot/` 中的 Book T 属性数据。
+2. 展开五层属性材料。
+3. 排除属性层无法支持的候选解释。
+4. 用纯属性语言收窄解释范围。
+5. 保留结构性歧义，避免把不收敛的材料硬写成结论。
 
-后检保留 R1（指涉对象规则）+ R2（隐式跨位）散文规则。
+## v4 工作流
 
-## 与 v3.x 的关键区别
+| 阶段 | 名称 | 执行者 | 内容 |
+|---|---|---|---|
+| Phase 3 | 确定性属性展开 | 脚本 / 数据层 | 从 JSON 展开 Book T 属性、复合像、牌位材料 |
+| Phase 4 | Via Negativa 收束 | LLM / Agent | 引用 Phase 3 精确材料，排除不支持的解释 |
+| 后检 | R1 / R2 散文规则 | LLM / Agent | 检查指涉对象、跨位偷换和叙事漂移 |
 
-v3.x 是散文风格规则盖在松地基上。v4.0 先跑确定性属性层（Phase 3），再把 LLM 解读约束在属性材料上做 via negativa 收束（Phase 4）。散文规则降级为后检。
+普通 prompt 可以提醒 AI 谨慎解读；这个 Skill 的优势在于数据、流程和检查点都放在同一套工作台里。
 
-## 方法论
+## 属性分层
 
-### 五层属性分层
-
-每张牌有五层可验证的硬属性：
+每张牌都有可验证的属性层。
 
 | 层 | 数字牌 | 大阿卡纳 | 宫廷牌 |
-|---|--------|---------|--------|
-| 1 | 元素 [hot/dry 等] | 归属 [planet/sign/element] | 复合元素 [Fire of Water 等] |
-| 2 | 源质×世界 [Geburah of Assiah] | 路径 [Chokmah→Tiphareth] | 黄道跨度 |
-| 3 | 旬星 [Moon in Taurus] | — | — |
-| 4 | 尊贵 [exaltation/detriment 等] | — | — |
-| 5 | 牌位 | 牌位 | 牌位 |
+|---|---|---|---|
+| 1 | 元素与冷热干湿 | 归属：行星 / 星座 / 元素 | 复合元素 |
+| 2 | 源质 × 世界 | 生命之树路径 | 黄道跨度 |
+| 3 | 旬星 | 路径两端 | 管辖旬星 |
+| 4 | 尊贵状态 | 希伯来字母 | 牌阶功能 |
+| 5 | 牌位语境 | 牌位语境 | 牌位语境 |
 
-### 从不是到是（Via Negativa）
-
-解读不靠"这张牌意味着什么"，而是靠排除：属性层不支持的解读方向先被排除，剩下的才能进入下一步。排出必须引用 Phase 3 输出的精确子串作为证据。
-
-### narrowed_field — 纯属性语言
-
-排除后用纯属性语言描述收窄后的场域。禁止出现牌名、行星名、星座名、源质名、路径名——只说压力、方向、运动、接受性、边界。
+检查时优先使用属性材料。Book T 标题可以做交叉校验，不能当作推导起点。
 
 ## 数据层
 
-`data/tarot/` 下三个 JSON 文件，包含全部 78 张牌的 Book T 属性：
-
-| 文件 | 内容 |
-|------|------|
-| `atu.json` | 22 张大阿卡纳：归属类型、路径、元素、品质、Book T 标题 |
-| `pips.json` | 40 张数字牌：源质、世界、旬星（行星×星座）、尊贵状态 |
-| `courts.json` | 16 张宫廷牌：复合元素、黄道跨度、管辖旬星 |
-
-数据源：Israel Regardie, *The Golden Dawn* (Llewellyn 6th ed.), Book T 章节。78/78 条目完整。
-
-## 使用方式
-
-任何 tarot spread 的结果，只要牌名能映射到 Book T 体系（标准 RWS 中文/英文牌名），都可以跑本检查。
-
-1. 拿到 tarot spread 原始抽取结果
-2. 用户追问或要求解读
-3. Agent 加载本 skill，先跑 Phase 3 属性展开，再执行 Phase 4 via negativa
-4. 输出通过检查的解读
-
-## 文件结构
-
-```
+```text
 symbol-anchor-check/
-├── README.md          # 本文件
-├── SKILL.md           # 主 skill 文件（v4.0）
+├── README.md
+├── SKILL.md
 └── data/
     └── tarot/
-        ├── atu.json   # 大阿卡纳
-        ├── pips.json  # 数字牌
-        └── courts.json # 宫廷牌
+        ├── atu.json      # 22 张大阿卡纳
+        ├── pips.json     # 40 张数字牌
+        └── courts.json   # 16 张宫廷牌
 ```
+
+`data/tarot/` 包含 78/78 张塔罗牌的 Book T 属性条目。
+
+| 文件 | 内容 |
+|---|---|
+| `atu.json` | 大阿卡纳：归属类型、路径、元素、品质、Book T 标题 |
+| `pips.json` | 数字牌：源质、世界、旬星、尊贵状态 |
+| `courts.json` | 宫廷牌：复合元素、黄道跨度、管辖旬星 |
+
+## 推荐搭配
+
+日常推荐搭配：
+
+1. 用 [spirit-communication-system v5.1 Lite](https://github.com/Kico-Tachagemofet/spirit-communication-system-lite) 获取原始塔罗结果。
+2. 对塔罗部分调用本 Skill。
+3. 如果同一轮里有易经结果，用 [meihua-yishu](https://github.com/Kico-Tachagemofet/meihua-yishu) 处理卦象。
+4. 最终解释由使用者结合问题语境、关系边界和现实情况判断。
+
+## Prompt 版与 Skill 版
+
+可以写一个轻量 prompt，提醒 AI 少用牌意检索。但完整流程更适合作为 Skill：
+
+- 需要读取 78 张 Book T JSON 数据。
+- 需要处理 RWS 中文牌名与 Book T ID 的映射。
+- 需要区分数字牌、大阿卡纳、宫廷牌的属性结构。
+- 需要保留属性不收敛的情况。
+- 需要在输出前做指涉对象和跨位偷换检查。
+
+当一个任务需要数据、映射和固定检查点，Agent Skill 会比单段 prompt 稳定很多。
+
+## 来源与边界
+
+本项目包含四类内容：
+
+1. 传统来源：Golden Dawn / Book T 塔罗属性体系。
+2. 作者整理：五层属性分层、Phase 3 / Phase 4 工作流、Via Negativa 收束规则。
+3. 程序生成：从 JSON 数据展开的属性材料。
+4. AI 参与：基于属性材料做排除、收束、交叉校验和叙事检查。
+
+Book T 数据来源：Israel Regardie, *The Golden Dawn* (Llewellyn 6th ed.), Book T 章节。
+
+本项目用于塔罗解读的属性一致性校验、符号分析和实验性 Agent 工作流。它不提供现实决策担保，不替代医疗、法律、财务或心理咨询建议。
 
 ## License
 
