@@ -1,5 +1,5 @@
 ---
-name: symbol-anchor-check-v4
+name: symbol-anchor-check
 description: "取象锚点检查 v4.0 — Phase 3 确定性属性层展开 + Phase 4 via negativa 收束。先跑 phase3_unfold.py 提取 Book T 属性层，再用排出法收束到 narrowed field。易经/骰子/字卡在 Phase 4 的跨符号校验阶段整合。继承 v3.4 的 R1/R2 散文规则作为后检。"
 tags: [divination, interpretation, quality-control, tarot, book-t, via-negativa, phase3, phase4]
 ---

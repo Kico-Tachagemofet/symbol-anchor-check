@@ -32,8 +32,11 @@ from pathlib import Path
 from typing import Any
 
 # ── Data paths ──────────────────────────────────────────────
-DATA_DIR = Path(os.path.expanduser("~/.hermes/data/tarot"))
-MIRACLE_REF = Path("/mnt/e/My Grimoire/My Grimoire/摘抄/占卜符号类/世界名画塔罗牌/f. 奇迹牌组 - 核心牌意提取.md")
+# Default: data/tarot/ next to this script. Override via SYMBOL_ANCHOR_DATA env var.
+DATA_DIR = Path(os.environ.get(
+    "SYMBOL_ANCHOR_DATA",
+    str(Path(__file__).resolve().parent / "data" / "tarot")
+))
 
 # ── Book T name → card_id mapping ───────────────────────────
 # Spirit draw output uses RWS names; Book T uses Golden Dawn IDs.
