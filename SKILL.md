@@ -1,95 +1,95 @@
 ---
 name: symbol-anchor-check-v4
-description: "Divination Anchor Check v4.0 — Phase 3 deterministic property unfolding + Phase 4 via negativa convergence. Runs phase3_unfold.py to extract Book T property layers, then uses elimination to narrow the field. I Ching / astro dice / word cards integrated in Phase 4 cross-symbol verification. Inherits v3.4 R1/R2 prose rules as post-check."
+description: "取象锚点检查 v4.0 — Phase 3 确定性属性层展开 + Phase 4 via negativa 收束。先跑 phase3_unfold.py 提取 Book T 属性层，再用排出法收束到 narrowed field。易经/骰子/字卡在 Phase 4 的跨符号校验阶段整合。继承 v3.4 的 R1/R2 散文规则作为后检。"
 tags: [divination, interpretation, quality-control, tarot, book-t, via-negativa, phase3, phase4]
 ---
 
-# Divination Anchor Check v4.0
+# 取象锚点检查 v4.0
 
-**Core change from v3.x**: v3.x was prose-style rules laid on loose ground. v4.0 runs a deterministic property layer (Phase 3) first, then constrains LLM interpretation to that property material via negativa convergence (Phase 4). Prose rules (R1/R2) are retained as post-checks after Phase 4 output.
+**核心理念变更**：v3.x 是散文风格规则盖在松地基上。v4.0 先跑确定性属性层（Phase 3），再把 LLM 解读约束在属性材料上做 via negativa 收束（Phase 4）。散文规则（R1/R2）作为 Phase 4 输出后的后检保留。
 
-## Trigger
+## 触发条件
 
-Triggered when the user asks follow-up questions or requests interpretation of an already-output divination spread result.
+用户对已输出的 5.1 Lite 抽取结果进行追问/要求解读时触发。
 
-## Pipeline Overview
+## 流程总览
 
 ```
-Spread output (6 cards + supplement + astro dice + I Ching + word cards)
+spirit_draw_v2 输出 (6 牌 + 补牌 + 骰子 + 易经 + 字卡)
         │
         ▼
-Phase 3 ── python3 phase3_unfold.py  ← deterministic, no LLM
-        │  Each tarot card → 5-layer property unfolding + compound_image
-        │  Miracle cards → core meaning + transformation mechanism
-        │  spread_synthesis → quality axes + elemental balance + sephirothic pattern
+Phase 3 ── python3 phase3_unfold.py  ← 确定性，不走 LLM
+        │  每张塔罗牌 → 5 层属性展开 + compound_image
+        │  奇迹牌 → 核心牌意 + 转化机制
+        │  spread_synthesis → 质量轴 + 元素平衡 + 源质模式
         │
         ▼
-Phase 4 ── LLM via negativa convergence
-        │  1. Elimination: rule out unsupported candidates, citing Phase 3 text as evidence
-        │  2. narrowed_field: pure property language (no card/planet/sephira/sign names)
-        │  3. Cross-symbol verification: I Ching + dice + word cards
-        │  4. answer: describe the scene, not the cards
-        │  5. open_threads: honestly preserve uncovered items
+Phase 4 ── LLM via negativa 收束
+        │  1. 排出：排除不支持的候选，引 Phase 3 原文为证
+        │  2. narrowed_field：纯属性语言（不提牌名/行星/源质/星座）
+        │  3. 跨符号校验：易经 + 骰子 + 字卡
+        │  4. answer：说场景不说牌
+        │  5. open_threads：诚实保留未覆盖项
         │
         ▼
-Post-check ─── R1/R2 prose rules (inherited from v3.4)
+后检 ─── R1/R2 散文规则（继承 v3.4）
 ```
 
 ---
 
-## Phase 3 — Execution
+## Phase 3 执行
 
-### Command
+### 命令
 
 ```bash
-python3 phase3_unfold.py <input.json>
+python3 "/mnt/e/My Grimoire/Hermes/.claude/scripts/phase3_unfold.py" <input.json>
 ```
 
-### Input Format
+### 输入格式
 
-Construct from the spread output. Place card names (RWS format) and positions:
+从 spirit_draw_v2.py 的输出构造。将牌名（RWS 格式）和位置填入：
 
 ```json
 {
   "spread": [
-    {"position": "Pos 1 [My State]", "card_name": "King of Miracles", "reversed": false},
-    {"position": "Pos 2 [Their State]", "card_name": "King of Pentacles", "reversed": true},
+    {"position": "Pos 1 [我的状态]", "card_name": "King of Miracles", "reversed": false},
+    {"position": "Pos 2 [他的状态]", "card_name": "King of Pentacles", "reversed": true},
     ...
     {"position": "Supp: Pos 1", "card_name": "Devil", "reversed": true, "supplement": true}
   ]
 }
 ```
 
-### Output Structure
+### 输出结构
 
-Standard cards:
+每张标准牌：
 ```json
 {
   "card_name": "Death",
   "card_id": "atu_13_death",
   "card_class": "major_arcana",
-  "position": "Pos 6 [What They Want to Say]",
+  "position": "Pos 6 [他想说的]",
   "reversed": true,
   "property_unfolding": {
     "element_layer": "The sign Scorpio supplies cold+moist as the primary posture...",
     "sephira_layer": "Path 24 links Tiphareth to Netzach...",
     "decan_layer": "No decan is assigned to this trump...",
     "dignity_layer": "...The card is reversed...",
-    "position_layer": "Landing on 'Pos 6 [What They Want to Say]'..."
+    "position_layer": "Landing on 'Pos 6 [他想说的]'..."
   },
-  "compound_image": "The position 'Pos 6 [What They Want to Say]' is touched by the sign Scorpio..."
+  "compound_image": "The position 'Pos 6 [他想说的]' is touched by the sign Scorpio..."
 }
 ```
 
-Miracle cards:
+每张奇迹牌：
 ```json
 {
   "card_name": "King of Miracles",
   "card_class": "miracle",
   "property_unfolding": {
-    "miracle_core": "Empty-regeneration — the middle way cutting through eternalism and nihilism...",
-    "miracle_mechanism": "Transcending the limits of self...",
-    "miracle_direction": "Upright: release attachment to 'I'...",
+    "miracle_core": "空性再生 — 斩常见与断见的中道...",
+    "miracle_mechanism": "超越自我有限性...",
+    "miracle_direction": "正位: 放下对「我」的执着...",
     "position_layer": "..."
   },
   "compound_image": "..."
@@ -98,163 +98,148 @@ Miracle cards:
 
 ---
 
-## Phase 4 — Via Negativa Convergence
+## Phase 4 — Via Negativa 收束
 
-### Methodology
+### 方法论
 
-**The event is the model; the cards are its projection.** Phase 3 has already unfolded the cards into property language (element / sephira / decan / dignity / position / compound image / cross-checks). Phase 4's job is to operate on this property material, not recall canned card meanings.
+**事件是模型，牌是事件的投影。** Phase 3 已经把牌展开成了属性语言（元素/源质/旬星/尊贵/位置/复合意象/交叉校验）。Phase 4 的工作是操作这些属性材料，不是回忆罐头牌意。
 
-### Step 1: Elimination
+### 第1步：排出
 
-For each unknown item (see fixed unknowns below), working from Phase 3 property material, **eliminate at least one candidate answer that the material does not support**.
+对每个 Phase 1 未知项（本系统的固定未知项见下），从 Phase 3 属性材料出发，**排除至少一个该材料不支持的候选答案**。
 
-**Candidates must be structural candidates** ("a smooth, low-friction reception" / "a passive, indifferent response"), not card-meaning negations ("not a conflict card" / "not a card representing love").
+**候选必须是结构性候选**（"一次平滑、低摩擦的接收""被动、漠不关心的回应"），不能是牌意否定（"不是冲突的牌""不是代表爱的牌"）。
 
-**Each elimination must carry evidence**, quoting **exact substrings** from Phase 3 output. Format:
+**每条排除必须附带证据**，引用 Phase 3 输出的**精确子串**。格式：
 
 ```
-Eliminate: [candidate description]
-Evidence:
+排除: [候选描述]
+证据:
   - card: Death, layer: element_layer, quote: "cold+moist as the primary posture"
   - card: Death, layer: sephira_layer, quote: "links Tiphareth to Netzach"
 ```
 
-### Reversed Card Elimination Ban (R0)
+### 本系统的固定未知项
 
-A reversed card does NOT negate its upright property. Phase 3's dignity_layer already states that a reversed card means "the same energy expressed through its negative form: repression, immaturity, or an out-of-control variant" — same energy, different expression, not energy vanishing.
+spirit_draw_v2 的 6 位牌阵对应以下未知项：
 
-In the elimination step, **it is forbidden to eliminate a structural candidate supported by the upright property solely because "the card is reversed."**
+1. **他的状态** (Pos 2)：他在做什么/处于什么能量状态
+2. **他的态度** (Pos 4)：他对当前语境持什么姿态
+3. **态度原因** (Pos 5)：为什么是这个态度
+4. **他想说的** (Pos 6)：他想传达什么
+5. **当前语境** (Pos 3)：两人之间正在发生什么（可用补牌锁定）
+6. **我的状态（他视角下）** (Pos 1)：他怎么看你当前的状态
 
-| Upright | Reversed Does NOT Mean |
-|---------|----------------------|
-| 9 of Wands: tense vigilance, steady force under tension | strength gone, no vigilance |
-| Queen: outward care/nurturing | no care, nurturing vanished |
-| Magician: skill/will/channel flowing | no skill, will absent |
-| World: completion, cycle closed | nothing was completed |
+### 第2步：narrowed_field
 
-Correct elimination for reversed cards: retain the upright property base (strength/care/flow/completion), **eliminate the candidate where "the property operates in a full, outward, frictionless manner."** A reversed card turns the same property inward, holds it back, or routes it through a less visible path — but the property itself did not evaporate.
+在排除后，用**纯属性语言**描述收窄后的场域。1-3 句。
 
-### Fixed Unknowns
+**可以使用**的词汇：姿势、压力、方向、重量、运动、接受性、限制、开放性、凝聚、轮廓、推进、静止、收缩、膨胀、传递、持有、边界。
 
-A 6-position spirit communication spread maps to the following unknowns:
+**禁止出现**：
+- 牌名、花色、数字、大牌/小牌
+- 行星名、星座名、源质名、路径名、世界名
+- "意味着""代表了""象征着""传统上""Book T 说"
+- 任何形式的"这张牌是..."
 
-1. **Their state** (Pos 2): what are they doing / what energy state
-2. **Their attitude** (Pos 4): what posture toward the current context
-3. **Reason for attitude** (Pos 5): why this attitude
-4. **What they want to say** (Pos 6): what they wish to convey
-5. **Current context** (Pos 3): what is happening between the two parties (supplement card can lock this)
-6. **My state (from their view)** (Pos 1): how they see your current state
+### 第3步：跨符号校验
 
-### Step 2: narrowed_field
+将 tarot narrowed field 与其他三套符号系统交叉验证：
 
-After elimination, describe the narrowed field using **pure property language**. 1–3 sentences.
+**易经**（本卦 + 变爻 + 之卦）：
+- 本卦核心意象 → 与 narrowed field 同向/反向/张力？
+- 变爻爻辞的动作 → 补充了什么？
+- 之卦走向 → 最终落在什么状态？
 
-**Allowed vocabulary**: posture, pressure, direction, weight, motion, receptivity, constraint, openness, cohesion, contour, propulsion, stillness, contraction, expansion, transmission, holding, boundary.
+**占星骰子**（行星 + 星座 + 宫位 + 飞星）：
+- 行星本性 → 什么力量在底层
+- 星座性质 → 什么模式
+- 宫位领域 → 落在哪个场域
+- 飞星 → 哪两个领域之间在流动
 
-**Forbidden**:
-- Card names, suits, numbers, major/minor arcana labels
-- Planet names, zodiac sign names, sephira names, path names, world names
-- "means", "represents", "symbolizes", "traditionally", "Book T says"
-- Any form of "this card is..."
+**字卡**（三张）：
+- 每张字卡的内容 + 落点（在场景的哪个位置/主体/动作上）
+- 必须显式引用字卡内容并给出落点
 
-### Step 3: Cross-Symbol Verification
+跨符号校验的结果写入 narrowed_field 之后的一小段（2-4 句），说明**多源同向/张力/补充**。
 
-Cross-validate the tarot narrowed_field against the other three symbol systems:
+### 第4步：answer
 
-**I Ching** (base hexagram + changing line + resultant hexagram):
-- Base hexagram core image → same direction / opposite / tension with narrowed_field?
-- Changing line text's action → what does it supplement?
-- Resultant hexagram direction → what state does it ultimately land on?
+2-6 句。说场景不说牌。使用与问题语言一致的口语。
 
-**Astro Dice** (planet + sign + house + flying stars):
-- Planetary nature → what force lies beneath
-- Sign quality → what mode
-- House domain → what field
-- Flying stars → flow between which two domains
+**禁止**：牌名、花色、行星、星座、源质、路径。禁止"这张牌说""塔罗显示"。说人话。
 
-**Word Cards** (three cards):
-- Content of each word card + landing point (which position/subject/action in the scene)
-- Must explicitly quote word card content and assign landing points
+### 第5步：open_threads
 
-Cross-symbol verification results go into a short paragraph (2–4 sentences) after narrowed_field, noting **multi-source alignment / tension / supplementation**.
-
-### Step 4: answer
-
-2–6 sentences. Describe the scene, not the cards. Use natural language matching the question's language.
-
-**Forbidden**: card names, suits, planets, signs, sephiroth, paths. Forbid "this card says" / "the tarot shows". Speak human.
-
-### Step 5: open_threads
-
-Honestly list unknown items that Phase 4 could not fully cover. Uncertainty is uncertainty — preserving gaps is better than fabricating.
+诚实列出 Phase 4 未能完全覆盖的未知项。不确定就是不确定——保留空档比编造要好。
 
 ---
 
-## Post-Check: R1/R2 Prose Rules (inherited from v3.4)
+## 后检：R1/R2 散文规则（继承 v3.4）
 
-Run on answer and narrowed_field after writing:
+answer 和 narrowed_field 写完后自检：
 
-### R1: Referent Rule
+### R1：指涉对象规则
 
-- Forbid abstract property nouns as agentive subjects (e.g., "moisture brings", "stillness causes")
-- Forbid element personification
-- Every sentence must pass the **naive listener test** — someone who doesn't know the spread can understand who is doing what
-- Use position-semantic roles for reference ("the one at her position", "the card beneath his attitude")
+- 禁止抽象属性名词做施事主语（如"湿润带来""静止导致"）
+- 禁止元素拟人化
+- 每句必须能通过「朴素听者测试」——不知道牌阵的人也能听懂谁在做什么
+- 用位置语义角色指代（"她那一位上""他态度底下的那张"）
 
-### R2: Implicit Cross-Position
+### R2：隐式跨位
 
-- Extending from one position to a related position requires property-layer support from that related position
+- 讨论某位置时延伸到关联位置，需要该位置自身的属性层支持
 
-### Forbidden Patterns
+### 禁止句式
 
-- "not X but rather Y" construction
-- "both X and Y" construction  
-- 3+ consecutive purely parallel sentences without logical connectors
-- "this means", "represents", "symbolizes"
+- 「不是……而是……」
+- 「既……又……」
+- 连续 3 句以上纯并列无逻辑连词
+- 「这意味着」「代表了」「象征着」
 
 ---
 
-## Output Template
+## 输出模板
 
 ```markdown
-## Phase 3 — Property Layers
+## Phase 3 属性层
 
-[per_card table: Position | Card | Element Layer | Sephira/Path Layer | Decan Layer | Dignity Layer]
-[spread_synthesis: quality axes + elemental balance + sephirothic pattern]
+[per_card 表格：位置 | 牌 | 元素层 | 源质/路径层 | 旬星层 | 尊贵层]
+[spread_synthesis：质量轴 + 元素平衡 + 源质模式]
 
-## Phase 4 — Via Negativa
+## Phase 4 Via Negativa
 
-### Elimination
-- Eliminate: [candidate] — Evidence: card X, layer Y, quote "..."
+### 排出
+- 排除: [候选] — 证据: card X, layer Y, quote "..."
 
 ### narrowed_field
-[pure property language, 1–3 sentences]
+[纯属性语言 1-3 句]
 
-### Cross-Symbol Verification
-[I Ching + dice + word cards cross-check]
+### 跨符号校验
+[易经 + 骰子 + 字卡 交叉验证]
 
 ### answer
-[describe the scene, not the cards]
+[说场景不说牌]
 
 ### open_threads
-[uncovered unknown items]
+[未覆盖的未知项]
 ```
 
 ---
 
-## Phase 3 Data Sources
+## Phase 3 数据来源
 
-- Standard 78 cards: `data/tarot/{atu,pips,courts}.json` (read-only reference)
-- Miracle 14 cards: hardcoded in `phase3_unfold.py` (source: miracle cards core meaning reference file)
-- I Ching: `data/yijing/`
-- Word cards: spread draw script output
-- Astro dice: spread draw script output
+- 标准 78 张：`~/.hermes/data/tarot/{atu,pips,courts}.json`（从 CC 只读引用）
+- 奇迹 14 张：硬编码于 `phase3_unfold.py`（来源：vault 奇迹牌组核心牌意提取.md）
+- 易经：`~/.hermes/data/yijing/`（已有）
+- 字卡：spirit_draw_v2.py 输出
+- 骰子：spirit_draw_v2.py 输出
 
-## Forbidden
+## 禁止
 
-- Skip Phase 3 property layers and jump directly to interpretation
-- Do card-meaning negation in elimination ("not a conflict card")
-- Card names / planet / sign / sephira / path names in narrowed_field or answer
-- Fabricate or invent properties not present in Phase 3
-- Use bullet lists in place of prose paragraphs (answer must be prose)
-- Use "not X but rather Y" construction in answer
+- 跳过 Phase 3 属性层直接做解读
+- 在排出中做牌意否定（"不是冲突的牌"）
+- 在 narrowed_field 或 answer 中出现牌名/行星/星座/源质/路径名
+- 编造或虚构 Phase 3 不存在的属性
+- 用 bullet 列表替代 prose 段落（answer 必须是散文）
+- 在 answer 中使用「不是……而是……」句式
