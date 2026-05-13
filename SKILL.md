@@ -42,7 +42,7 @@ Phase 4 ── LLM via negativa 收束
 ### 命令
 
 ```bash
-python3 "/mnt/e/My Grimoire/Hermes/.claude/scripts/phase3_unfold.py" <input.json>
+python3 phase3_unfold.py <input.json>
 ```
 
 ### 输入格式
@@ -229,9 +229,9 @@ answer 和 narrowed_field 写完后自检：
 
 ## Phase 3 数据来源
 
-- 标准 78 张：`~/.hermes/data/tarot/{atu,pips,courts}.json`（从 CC 只读引用）
-- 奇迹 14 张：硬编码于 `phase3_unfold.py`（来源：vault 奇迹牌组核心牌意提取.md）
-- 易经：`~/.hermes/data/yijing/`（已有）
+- 标准 78 张：`data/tarot/{atu,pips,courts}.json`（只读引用）
+- 奇迹 14 张：硬编码于 `phase3_unfold.py`（来源：奇迹牌组核心牌意提取.md）
+- 易经：`data/yijing/`
 - 字卡：spirit_draw_v2.py 输出
 - 骰子：spirit_draw_v2.py 输出
 
