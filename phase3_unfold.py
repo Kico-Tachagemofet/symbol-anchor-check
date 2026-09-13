@@ -1,42 +1,42 @@
 #!/usr/bin/env python3
-"""
-Phase 3 — Deterministic Property Layer Unfolding
-Reimplements Claude Code's phase3_analyzer logic as a standalone Hermes module.
-Reads Book T correspondence data (atu/pips/courts.json) and Miracle牌意.
-Accepts a spread dict, outputs property_unfolding + compound_image + spread_synthesis.
+"""Deterministic Book T unfolding; optional Miracle add-on. No random draws.
 
-Usage:
-  python3 phase3_unfold.py < spread_input.json
-  python3 phase3_unfold.py spread_input.json
-
-Input format (matching spirit_draw_v2 output card names):
-{
-  "spread": [
-    {"position": "Pos 1 [我的状态]", "card_name": "King of Miracles", "reversed": false},
-    {"position": "Pos 2 [他的状态]", "card_name": "King of Pentacles", "reversed": true},
-    ...
-  ],
-  "supplements": [
-    {"for_position": "Pos 1 [我的状态]", "card_name": "Devil", "reversed": true},
-    ...
-  ]
-}
+Run: python phase3_unfold.py input.json
+Accepts a card array or {"spread": [...], "supplements": [...]}.
 """
 
 import json
 import os
+import re
 import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-# ── Data paths ──────────────────────────────────────────────
-# Default: data/tarot/ next to this script. Override via SYMBOL_ANCHOR_DATA env var.
-DATA_DIR = Path(os.environ.get(
-    "SYMBOL_ANCHOR_DATA",
-    str(Path(__file__).resolve().parent / "data" / "tarot")
-))
+# ── stdout/stderr UTF-8 guard ───────────────────────────────
+# Use UTF-8 for redirected output as well as interactive Windows terminals.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+# Data defaults to this checkout; overrides are explicit.
+DATA_DIR = Path(os.environ.get("SYMBOL_ANCHOR_DATA", str(Path(__file__).resolve().parent / "data/tarot"))).expanduser()
+_here = Path(__file__).resolve().parent
+_addon_override = os.environ.get("MIRACLE_ADDON_DIR")
+_addon_candidates = ([Path(_addon_override).expanduser()] if _addon_override else [
+    _here / "addons/miracle-anchor-addon",
+    _here.parent / "miracle-anchor-addon",
+])
+sys.dont_write_bytecode = True
+miracle_unfold = None
+for _candidate in _addon_candidates:
+    if (_candidate / "miracle_unfold.py").is_file():
+        sys.path.insert(0, str(_candidate))
+        import miracle_unfold
+        break
 
 # ── Book T name → card_id mapping ───────────────────────────
 # Spirit draw output uses RWS names; Book T uses Golden Dawn IDs.
@@ -197,93 +197,9 @@ WORLD_POSTURES = {
     "Assiah": "the material world of earth and action",
 }
 
-# ── Miracle牌意（硬编码核心意，来源：奇迹牌组核心牌意提取.md） ──
-MIRACLE_MEANINGS = {
-    "King of Miracles": {
-        "core": "空性再生 — 斩常见与断见的中道，在空性中持续生成新的存在形态",
-        "upright": "放下对「我」的执着，空了但没有消失，持续再生",
-        "reversed": "堕入常见（僵化自我设限）或断见（将空性误读为虚无）",
-        "mechanism": "超越自我有限性，不再需要任何版本的边界",
-    },
-    "Queen of Miracles": {
-        "core": "复活 — 经历了象征性死亡后以崭新形态重新存在",
-        "upright": "阴性力量的复辟，温柔的、自上而下的感召",
-        "reversed": "复活未能完成，仍困在旧形态中",
-        "mechanism": "审判之后的状态——死亡天使不是在审判，是在温柔接引",
-    },
-    "Knight of Miracles": {
-        "core": "阴影整合 — 阴影显现、叛逆、对权威的质疑",
-        "upright": "路西法的坠落——痛苦但必要的分离，阴影已成为你的一部分后的重生",
-        "reversed": "拒绝与阴影整合，方向迷失，与潜意识隔离",
-        "mechanism": "承认光暗一体后的重生过程",
-    },
-    "Page of Miracles": {
-        "core": "跨越边界 — 站在边界上，即将跨越",
-        "upright": "痛苦但不可逆的转变正在发生，站在门槛上的恐惧",
-        "reversed": "已经被推过去之后的剧变体验——旧自我毁灭，灵性指引，共时性的暗示",
-        "mechanism": "跨越本身没有正负之分",
-    },
-    "Ace of Miracles": {
-        "core": "重置 — 旧循环走到终点，归零后的重新开始",
-        "upright": "一切推倒重来的起点，转化本身的种子",
-        "reversed": "拒绝承认旧循环已结束，或归零后无法启动",
-        "mechanism": "一切人格变化的前提：先承认旧的已经走到尽头",
-    },
-    "2 of Miracles": {
-        "core": "着魔 — 被某种力量/观念/情感完全占据",
-        "upright": "丧失对自身原有身份的觉知，不由自主",
-        "reversed": "从着魔中醒来，个体意志回归",
-        "mechanism": "人格结构被外力接管",
-    },
-    "3 of Miracles": {
-        "core": "直面阴影 / 净化仪式",
-        "upright": "被迫面对黑暗面 + 经由仪式性净化清除负面能量",
-        "reversed": "拒绝直面，蒙住眼睛；压抑带来的不是安全而是更深焦虑",
-        "mechanism": "心理层（你面对阴影）+ 仪式层（某种力量在对你施加净化）",
-    },
-    "4 of Miracles": {
-        "core": "人格放大 — 承接超越自身的力量或认知",
-        "upright": "人格向更大维度扩展，存在本身被撑大",
-        "reversed": "放大失控，承接了超出自己容量的东西",
-        "mechanism": "外来伟大内容进入人格并被吸收",
-    },
-    "5 of Miracles": {
-        "core": "英雄认同 — 经由崇拜唤醒潜能",
-        "upright": "被他者的伟大所感召而发生内在转变",
-        "reversed": "认同变成盲从，过度控制、刻意模仿，反而压抑自身本能",
-        "mechanism": "力量与勇气的来源不是自生的，而是经由崇拜被唤醒的",
-    },
-    "6 of Miracles": {
-        "core": "团体认同 — 在集体场域中的人格变化",
-        "upright": "从团体中获得支持、勇气和归属感",
-        "reversed": "团体心理的退行——群体恐慌、盲从、个体意识被集体情绪淹没",
-        "mechanism": "你在团体中变成了一个不同的人",
-    },
-    "7 of Miracles": {
-        "core": "人格缩小 — 内在坍缩，行动力丧失",
-        "upright": "被打击到缩成一团，一个本来强大的存在失去了行动的勇气",
-        "reversed": "被压制的潜能仍在，坚定的守护仍在，只是尚未被看见",
-        "mechanism": "「我」本身变小了",
-    },
-    "8 of Miracles": {
-        "core": "技术超越 — 通过技艺精进实现层次跃升",
-        "upright": "代达罗斯成功了——技术本身是有效的",
-        "reversed": "伊卡洛斯坠落——技术力量在自我整合尚未完成时失控",
-        "mechanism": "通过技术/技艺/学术的精进实现人格层次跃升",
-    },
-    "9 of Miracles": {
-        "core": "神圣遭遇 — 遭遇超越日常认知框架的神秘体验",
-        "upright": "认知结构被根本性地震动，存在本身被触碰了",
-        "reversed": "被神圣感的恐惧吞没，无法整合体验；或偏执的迷信/全面拒斥",
-        "mechanism": "遭遇了超越日常认知框架的神秘体验",
-    },
-    "10 of Miracles": {
-        "core": "「我」的边界位移",
-        "upright": "意识到「我」比「我以为的我」更大——不是发现了新东西，而是发现边界比以为的远",
-        "reversed": "把门关上了——封闭、自我隔离、拒绝承认内在还有更大的存在",
-        "mechanism": "不是高我，不是外部存在——全部都是你，只是边界移动了",
-    },
-}
+# Generic reversal note — appended to dignity_layer for any reversed card (78-card
+# deck and, via miracle_unfold, the miracle deck). Single source of truth.
+REVERSAL_NOTE = " The card is reversed, indicating the same energy expressed through its negative form: repression, immaturity, or an out-of-control variant."
 
 
 # ── Helpers ─────────────────────────────────────────────────
@@ -310,7 +226,7 @@ def _attribution_phrase(attribution: dict, sentence_start: bool = False) -> str:
 
 
 def _append_reversal_note(s: str) -> str:
-    return s + " The card is reversed, indicating the same energy expressed through its negative form: repression, immaturity, or an out-of-control variant."
+    return s + REVERSAL_NOTE
 
 
 def _split_compound(compound: str) -> tuple[str, str]:
@@ -405,23 +321,6 @@ def unfold_court(book_t: dict, position_label: str, reversed_flag: bool) -> dict
     }
 
 
-def unfold_miracle(card_name: str, position_label: str, reversed_flag: bool) -> dict:
-    """Unfold a Miracle card using the hardcoded meanings."""
-    info = MIRACLE_MEANINGS.get(card_name, {})
-    if not info:
-        return {"error": f"Unknown miracle card: {card_name}"}
-
-    direction = "reversed" if reversed_flag else "upright"
-    direction_text = info.get(direction, info.get("core", ""))
-
-    return {
-        "miracle_core": info.get("core", ""),
-        "miracle_mechanism": info.get("mechanism", ""),
-        "miracle_direction": f"{'逆位' if reversed_flag else '正位'}: {direction_text}",
-        "position_layer": f"Landing on '{position_label}', this Miracle card marks a personality-structure transformation at play in this position.",
-    }
-
-
 # ── Compound image ──────────────────────────────────────────
 def compound_pip(book_t: dict, position_label: str) -> str:
     element = book_t["element"]
@@ -462,13 +361,6 @@ def compound_court(book_t: dict, position_label: str) -> str:
     )
 
 
-def compound_miracle(card_name: str, position_label: str, reversed_flag: bool) -> str:
-    info = MIRACLE_MEANINGS.get(card_name, {})
-    direction = "逆位" if reversed_flag else "正位"
-    core = info.get("core", "")
-    return f"The position '{position_label}' carries {card_name} {direction} — {core}."
-
-
 # ── Spread synthesis ────────────────────────────────────────
 PILLARS = {
     "Kether": "Middle", "Tiphareth": "Middle", "Yesod": "Middle", "Malkuth": "Middle",
@@ -482,8 +374,13 @@ def synthesize_spread(per_card: list[dict]) -> dict:
     element_counts: Counter[str] = Counter()
     pillar_counts: Counter[str] = Counter()
     sephira_counts: Counter[str] = Counter()
+    other_element_counts: Counter[str] = Counter()
+    primary_cards = [card for card in per_card if not card.get("supplement", False)]
+    supplements = [card for card in per_card if card.get("supplement", False)]
 
-    for card in per_card:
+    # Main-spread working uses main draws. Supplements retain their full local
+    # unfolding, but do not add cross-position elemental/sephirothic votes.
+    for card in primary_cards:
         raw = card.get("raw_correspondences", {})
         if not raw:
             continue
@@ -495,13 +392,20 @@ def synthesize_spread(per_card: list[dict]) -> dict:
             compound = raw["element_compound"]
             if " of " in compound:
                 elem = compound.split(" of ")[1]  # "Fire of Earth" → "Earth"
-        if elem:
+        # Only the four classical elements enter elemental balance; the Miracle deck's
+        # Aether is intentionally excluded by this positive check.
+        if elem and elem in {"Fire", "Water", "Air", "Earth"}:
             element_counts[elem] += 1
+        elif elem:
+            other_element_counts[elem] += 1
         seph = raw.get("sephira")
         if seph:
-            sephira_counts[seph] += 1
-            if seph in PILLARS:
-                pillar_counts[PILLARS[seph]] += 1
+            # Miracle cards carry a sephira list (may be a 双主锚); standard cards a single string
+            seph_list = seph if isinstance(seph, list) else [seph]
+            for s in seph_list:
+                sephira_counts[s] += 1
+                if s in PILLARS:
+                    pillar_counts[PILLARS[s]] += 1
 
     # Quality axes
     if not quality_counts:
@@ -524,7 +428,7 @@ def synthesize_spread(per_card: list[dict]) -> dict:
         missing = sorted(all_elems - set(element_counts))
         dom_text = " + ".join(dominant) if len(dominant) < 4 else "no single element"
         miss_text = " + ".join(missing) if missing else "none"
-        elemental_balance = f"Dominant: {dom_text}; missing: {miss_text}."
+        elemental_balance = f"Main-card element counts — most represented: {dom_text}; not represented in this sample: {miss_text}."
 
     # Sephirothic pattern
     concentrated = [p for p, c in pillar_counts.items() if c >= 3]
@@ -541,6 +445,22 @@ def synthesize_spread(per_card: list[dict]) -> dict:
         "quality_axes": quality_axes,
         "elemental_balance": elemental_balance,
         "sephirothic_pattern": sephirothic,
+        "counts": {
+            "elements": dict(element_counts),
+            "primary_qualities": dict(quality_counts),
+            "sephiroth": dict(sephira_counts),
+            "pillars": dict(pillar_counts),
+            "other_elements": dict(other_element_counts),
+            "primary_card_count": len(primary_cards),
+            "supplement_card_count": len(supplements),
+        },
+        "participation": {
+            "scope": "primary_cards_only",
+            "working_positions": [card.get("position") for card in primary_cards],
+            "supplement_positions": [card.get("position") for card in supplements],
+            "element_count_basis": "One attributed classical element per main card; court inner/suit element. Aether is listed in other_elements.",
+            "quality_count_basis": "Declared primary_qualities per main card; court outer/rank qualities. Supplements clarify their parent position locally.",
+        },
         "explicit_unknowns": [
             "The concrete referent of each position remains outside Phase 3.",
             "Which pressure should govern the spread is not decided by the property layer alone.",
@@ -550,9 +470,96 @@ def synthesize_spread(per_card: list[dict]) -> dict:
 
 
 # ── Main ─────────────────────────────────────────────────────
+def normalize_spread_input(data: Any) -> list[dict]:
+    """Accept a card list or {spread, supplements}, without changing its draws.
+
+    Supplements may be inline or in the documented top-level list. Resolve
+    their parent explicitly so local clarification cannot become another
+    main-card participant. Duplicate inputs are reported rather than dropped.
+    """
+    if isinstance(data, dict):
+        cards = data.get("spread")
+        extra = data.get("supplements", [])
+    else:
+        cards, extra = data, []
+    if not isinstance(cards, list) or not isinstance(extra, list):
+        raise ValueError("Expected a card list or an object with spread and optional supplements lists")
+
+    entries = []
+    for items, from_supplements in ((cards, False), (extra, True)):
+        for original in items:
+            if not isinstance(original, dict):
+                raise ValueError("Each card entry must be an object")
+            entry = deepcopy(original)
+            if not isinstance(entry.get("card_name"), str) or not entry["card_name"].strip():
+                raise ValueError("Each card entry needs a card_name")
+            for flag in ("reversed", "supplement"):
+                if flag in entry and not isinstance(entry[flag], bool):
+                    raise ValueError(f"{flag} must be a JSON boolean for {entry['card_name']}")
+            label = entry.get("position")
+            if label is not None and not isinstance(label, str):
+                raise ValueError("position must be a string")
+            entry["supplement"] = bool(
+                from_supplements or entry.get("supplement")
+                or entry.get("for_position") is not None
+                or entry.get("parent_position") is not None
+                or (label and label.startswith("Supp:"))
+            )
+            entries.append(entry)
+
+    main_positions: dict[str, dict] = {}
+    numbered_positions: dict[str, list[str]] = {}
+
+    def position_number(label: str) -> str | None:
+        match = re.match(r"^Pos\s*(\d+)\b", label, re.IGNORECASE)
+        return str(int(match.group(1))) if match else None
+
+    for ordinal, entry in enumerate(entries, 1):
+        if entry["supplement"]:
+            continue
+        position = entry.get("position") or f"position {entry.get('position_index', ordinal)}"
+        if position in main_positions:
+            raise ValueError(f"Duplicate primary position: {position}")
+        entry["position"] = position
+        entry["parent_position"] = None
+        main_positions[position] = entry
+        number = position_number(position)
+        if number is not None:
+            numbered_positions.setdefault(number, []).append(position)
+
+    seen_supplements = set()
+    for entry in entries:
+        if not entry["supplement"]:
+            continue
+        parent = entry.get("parent_position") or entry.get("for_position")
+        if parent is None and (entry.get("position") or "").startswith("Supp:"):
+            parent = entry["position"][5:].strip()
+        if not isinstance(parent, str) or not parent.strip():
+            raise ValueError(f"Supplement {entry['card_name']} requires a parent_position or for_position")
+        parent = parent.strip()
+        if parent not in main_positions:
+            matches = numbered_positions.get(position_number(parent), [])
+            if len(matches) != 1:
+                raise ValueError(f"Unknown or ambiguous supplement parent position: {parent}")
+            parent = matches[0]
+        identity = (parent, NAME_TO_ID.get(entry["card_name"], entry["card_name"]))
+        if identity in seen_supplements:
+            raise ValueError(f"Duplicate supplement for {parent}: {entry['card_name']}; reconcile with the original draw")
+        seen_supplements.add(identity)
+        entry["parent_position"] = parent
+        entry["position"] = entry.get("position") or f"Supp: {parent}"
+    return entries
+
+
 def unfold_spread(spread_input: list[dict]) -> dict:
     """Unfold a full spread into Phase 3 property layers."""
+    spread_input = normalize_spread_input(spread_input)
     card_index = load_card_index()
+    miracle_postures = {"sephira": SEPHIRA_POSTURES, "planet": PLANET_POSTURES, "sign": SIGN_POSTURES}
+    # Miracle deck data is loaded lazily — only when a miracle card is actually
+    # encountered — so a corrupt/missing miracle.json never breaks a pure 78-card
+    # spread. The "78 cards don't depend on the addon" boundary stays intact.
+    miracle_data: dict | None = None
     per_card = []
 
     for entry in spread_input:
@@ -561,18 +568,43 @@ def unfold_spread(spread_input: list[dict]) -> dict:
         reversed_flag = bool(entry.get("reversed", False))
         is_supplement = bool(entry.get("supplement", False))
 
-        # Check if Miracle card
+        # Miracle card — unfolding is delegated to the miracle-anchor-addon skill
         if "Miracle" in card_name or "Miracles" in card_name:
-            unfolding = unfold_miracle(card_name, position, reversed_flag)
-            if "error" in unfolding:
-                raise ValueError(f"Phase 3 cannot continue: {unfolding['error']} at {position}")
-            compound = compound_miracle(card_name, position, reversed_flag)
+            if miracle_unfold is None:
+                raise ValueError(
+                    f"Phase 3 cannot continue: miracle card {card_name!r} at {position}, "
+                    f"but the miracle-anchor-addon skill (miracle_unfold.py) was not found"
+                )
+            if miracle_data is None:
+                miracle_data = miracle_unfold.load_miracle_index()
+            mcard = miracle_data.get("cards", {}).get(card_name)
+            if not mcard:
+                raise ValueError(
+                    f"Phase 3 cannot continue: unknown miracle card {card_name!r} at {position} "
+                    f"(not found in the addon's miracle.json)"
+                )
+            unfolding = miracle_unfold.unfold_miracle(
+                mcard, position, reversed_flag, miracle_postures, REVERSAL_NOTE
+            )
+            compound = miracle_unfold.compound_miracle(mcard, position, miracle_postures)
+            raw_corr = {
+                "core_meaning": mcard.get("core_meaning", ""),
+                "element": miracle_data.get("element", "Aether"),
+                "sephira": mcard.get("sephira") or [],
+                "planet": mcard.get("planet") or [],
+                "zodiac": mcard.get("zodiac") or [],
+                "source": "miracle-anchor-addon: project-authored core meanings and correspondences",
+            }
             per_card.append({
                 "card_name": card_name,
                 "card_class": "miracle",
                 "position": position,
                 "reversed": reversed_flag,
                 "supplement": is_supplement,
+                "role": "supplement" if is_supplement else "primary",
+                "parent_position": entry.get("parent_position"),
+                "working_eligible": not is_supplement,
+                "raw_correspondences": raw_corr,
                 "property_unfolding": unfolding,
                 "compound_image": compound,
             })
@@ -615,6 +647,9 @@ def unfold_spread(spread_input: list[dict]) -> dict:
             "position": position,
             "reversed": reversed_flag,
             "supplement": is_supplement,
+            "role": "supplement" if is_supplement else "primary",
+            "parent_position": entry.get("parent_position"),
+            "working_eligible": not is_supplement,
             "raw_correspondences": deepcopy(book_t),
             "property_unfolding": unfolding,
             "compound_image": compound,
@@ -635,10 +670,21 @@ if __name__ == "__main__":
     else:
         data = json.load(sys.stdin)
 
-    spread = data.get("spread", data)
     try:
+        spread = normalize_spread_input(data)
         result = unfold_spread(spread)
     except ValueError as exc:
         print(json.dumps({"error": str(exc)}, ensure_ascii=False, indent=2), file=sys.stderr)
         sys.exit(1)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    # 本脚本只产 Phase 3 属性【数据】，不是解读。把告示钉进输出 + stderr 横幅，
+    _NOTICE = (
+        "Phase 3 属性资料已展开。请调用 symbol-anchor-check skill，继续完成 "
+        "Phase 3.5 元素关系与场域称重、Phase 4 via-negativa 收束及跨符号校验，"
+        "随后生成 answer。"
+    )
+    print(json.dumps({"_notice": _NOTICE, **result}, ensure_ascii=False, indent=2))
+    _bar = "=" * 72
+    print(f"\n{_bar}", file=sys.stderr)
+    print("  Phase 3 资料步骤完成；请 Skill-invoke symbol-anchor-check 继续解读流程。", file=sys.stderr)
+    print("  下一步：元素关系与场域称重 → via negativa → 跨符号校验 → answer。", file=sys.stderr)
+    print(_bar, file=sys.stderr)

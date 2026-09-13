@@ -1,0 +1,197 @@
+{
+  "deck": "miracle",
+  "element": "Aether",
+  "element_note": "第五元素 Quintessence / Aether — 灵性或精神本身，不属火水风土；处理的是人格结构本身的转化层级",
+  "source": {
+    "core_meaning": "Concise Miracle-deck meanings maintained by this project; no card artwork is bundled.",
+    "anchors": "Project-authored sephira, planet and zodiac associations; these are not Book T assignments.",
+    "orientation": "Reversed expression is derived during Phase 4 from the same core and attributes."
+  },
+  "cards": {
+    "Ace of Miracles": {
+      "core_meaning": "重置 — 旧循环走到终点，归零后的重新开始",
+      "sephira": [
+        "Binah"
+      ],
+      "planet": [
+        "Saturn"
+      ],
+      "zodiac": [
+        "Capricorn",
+        "Scorpio"
+      ]
+    },
+    "2 of Miracles": {
+      "core_meaning": "着魔 — 被某种力量、观念或情感完全占据，丧失对自身原有身份的觉知",
+      "sephira": [
+        "Netzach",
+        "Yesod"
+      ],
+      "planet": [
+        "Venus",
+        "Moon"
+      ],
+      "zodiac": [
+        "Taurus",
+        "Pisces"
+      ]
+    },
+    "3 of Miracles": {
+      "core_meaning": "直面阴影 / 净化仪式 — 双层结构：心理层直面自己的黑暗面，仪式层某种力量对你施加净化",
+      "sephira": [
+        "Binah",
+        "Yesod"
+      ],
+      "planet": [
+        "Mars",
+        "Saturn"
+      ],
+      "zodiac": [
+        "Scorpio"
+      ]
+    },
+    "4 of Miracles": {
+      "core_meaning": "人格放大 — 个体承接了超越自身的力量或认知，人格向更大的维度扩展",
+      "sephira": [
+        "Chesed"
+      ],
+      "planet": [
+        "Jupiter",
+        "Sun"
+      ],
+      "zodiac": [
+        "Leo",
+        "Sagittarius"
+      ]
+    },
+    "5 of Miracles": {
+      "core_meaning": "英雄认同 — 通过对榜样/导师/理想形象的认同，激发自身被束缚的潜能",
+      "sephira": [
+        "Tiphareth"
+      ],
+      "planet": [
+        "Sun"
+      ],
+      "zodiac": [
+        "Leo"
+      ]
+    },
+    "6 of Miracles": {
+      "core_meaning": "团体认同 — 从团体中获得支持、勇气和归属感，人格结构在集体场域中变化",
+      "sephira": [
+        "Yesod"
+      ],
+      "planet": [
+        "Moon"
+      ],
+      "zodiac": [
+        "Cancer",
+        "Aquarius"
+      ]
+    },
+    "7 of Miracles": {
+      "core_meaning": "潜力受抑 — 原本潜力更大的存在出于某种原因，行动的潜力被压抑了",
+      "sephira": [
+        "Netzach"
+      ],
+      "planet": [
+        "Venus"
+      ],
+      "zodiac": [
+        "Taurus"
+      ]
+    },
+    "8 of Miracles": {
+      "core_meaning": "技术超越 — 通过技术/技艺/学术的精进实现人格层次的跃升",
+      "sephira": [
+        "Hod"
+      ],
+      "planet": [
+        "Mercury"
+      ],
+      "zodiac": [
+        "Aquarius",
+        "Gemini"
+      ]
+    },
+    "9 of Miracles": {
+      "core_meaning": "神圣遭遇 — 遭遇了超越日常认知框架的神秘体验，存在本身被触碰",
+      "sephira": [
+        "Yesod"
+      ],
+      "planet": [
+        "Moon"
+      ],
+      "zodiac": [
+        "Pisces",
+        "Scorpio"
+      ]
+    },
+    "10 of Miracles": {
+      "core_meaning": "「我」的边界位移 — 意识到「我」比「我以为的我」更大，不是发现新东西，而是发现边界比以为的远",
+      "sephira": [
+        "Tiphareth"
+      ],
+      "planet": [
+        "Sun",
+        "Moon"
+      ],
+      "zodiac": [
+        "Gemini",
+        "Pisces"
+      ]
+    },
+    "Page of Miracles": {
+      "core_meaning": "跨越边界 — 站在/跨过转变的门槛，痛苦但不可逆的转变正在发生",
+      "sephira": [
+        "Hod",
+        "Yesod"
+      ],
+      "planet": [
+        "Mercury"
+      ],
+      "zodiac": [
+        "Gemini"
+      ]
+    },
+    "Knight of Miracles": {
+      "core_meaning": "阴影整合 — 阴影显现、叛逆、对权威的质疑，承认光暗一体后的重生",
+      "sephira": [
+        "Geburah"
+      ],
+      "planet": [
+        "Mars"
+      ],
+      "zodiac": [
+        "Aries",
+        "Leo"
+      ]
+    },
+    "King of Miracles": {
+      "core_meaning": "空性再生（斩常见与断见的中道）— 超越自我的有限性，斩除常见与断见，在空性中持续生成新的存在形态",
+      "sephira": [
+        "Tiphareth"
+      ],
+      "planet": [
+        "Sun"
+      ],
+      "zodiac": [
+        "Leo",
+        "Capricorn"
+      ]
+    },
+    "Queen of Miracles": {
+      "core_meaning": "复活 / 新形态的承接 — 象征性死亡已经过去，主体承接已经形成的新生，以崭新的形态重新存在并进入现实",
+      "sephira": [
+        "Malkuth"
+      ],
+      "planet": [
+        "Moon"
+      ],
+      "zodiac": [
+        "Taurus",
+        "Cancer"
+      ]
+    }
+  }
+}
