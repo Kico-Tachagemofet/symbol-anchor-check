@@ -1,4 +1,4 @@
-# Symbol Anchor Check v4.2
+# Symbol Anchor Check v4.3
 
 面向 AI Agent 的塔罗属性与解读 Skill。它以 Golden Dawn / Book T 属性为底稿，先看整场怎样运作，再比较事件解释，最后把有依据的部分写成人能理解的答案。
 
@@ -97,3 +97,17 @@ Book T 数据来源沿用 **Israel Regardie, *The Golden Dawn*（Llewellyn 第 6
 ## License
 
 MIT。第三方原著、出版文本与原牌组素材的权利说明见 [SOURCES.md](SOURCES.md)。
+
+
+## 可选 Kico 大阿卡纳牌意 DLC
+
+支持 [Kico 大阿卡纳牌意 v1.0.0](https://github.com/Kico-Tachagemofet/kico-tarot-meanings)。
+安装本 skill 不自动启用或下载正文。使用 `--meanings-pack <包目录>` 开启，
+`--no-meanings` 显式关闭；错误会明确报告。
+正文按本次需要加载，并记录包版本、单牌版本、校验值和文本 token 增量。
+
+解读须执行 [牌意接入说明](references/meaning-pack.md)。
+网站接入与已有结果切换见
+[HANDOFF](https://github.com/Kico-Tachagemofet/kico-tarot-meanings/blob/main/HANDOFF.md)。
+正文独立采用 CC BY-NC-SA 4.0；内置 `card_meanings.py` 读取器采用 MIT，
+版权声明见 `LICENSE-MEANING-READER`，不会改变本仓库其他内容的许可。

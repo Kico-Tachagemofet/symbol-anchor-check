@@ -26,6 +26,7 @@ class PublicPackageTests(unittest.TestCase):
         self.package = self.scratch / "installed skill"
         self.package.mkdir()
         shutil.copy2(ROOT / "phase3_unfold.py", self.package)
+        shutil.copy2(ROOT / "card_meanings.py", self.package)
         shutil.copytree(ROOT / "data/tarot", self.package / "data/tarot")
         self.env = os.environ.copy()
         for key in ("SYMBOL_ANCHOR_DATA", "MIRACLE_ADDON_DIR", "PYTHONPATH"):

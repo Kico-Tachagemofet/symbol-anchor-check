@@ -5,6 +5,8 @@ Run: python phase3_unfold.py input.json
 Accepts a card array or {"spread": [...], "supplements": [...]}.
 """
 
+import argparse
+import importlib.util
 import json
 import os
 import re
@@ -13,6 +15,12 @@ from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+
+# Shared DLC reader; file-based import also supports relocated skill installs.
+_meaning_spec = importlib.util.spec_from_file_location(
+    "kico_card_meanings_reader", Path(__file__).resolve().parent / "card_meanings.py")
+_meanings = importlib.util.module_from_spec(_meaning_spec)
+_meaning_spec.loader.exec_module(_meanings)
 
 # ── stdout/stderr UTF-8 guard ───────────────────────────────
 # Use UTF-8 for redirected output as well as interactive Windows terminals.
@@ -551,8 +559,12 @@ def normalize_spread_input(data: Any) -> list[dict]:
     return entries
 
 
-def unfold_spread(spread_input: list[dict]) -> dict:
+def unfold_spread(spread_input: list[dict], meanings_pack=None) -> dict:
     """Unfold a full spread into Phase 3 property layers."""
+    pack_path = _meanings.resolve_pack(
+        None if meanings_pack is False else meanings_pack,
+        disabled=meanings_pack is False, config_dir=Path(__file__).resolve().parent)
+    pack = _meanings.MeaningPack(pack_path) if pack_path else None
     spread_input = normalize_spread_input(spread_input)
     card_index = load_card_index()
     miracle_postures = {"sephira": SEPHIRA_POSTURES, "planet": PLANET_POSTURES, "sign": SIGN_POSTURES}
@@ -657,23 +669,29 @@ def unfold_spread(spread_input: list[dict]) -> dict:
 
     spread_synth = synthesize_spread(per_card)
 
-    return {
+    return _meanings.enrich_anchor({
         "per_card": per_card,
         "spread_synthesis": spread_synth,
-    }
+    }, pack)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] not in ("-", "--help", "-h"):
-        with open(sys.argv[1], "r", encoding="utf-8") as f:
-            data = json.load(f)
-    else:
-        data = json.load(sys.stdin)
-
+    parser = argparse.ArgumentParser(
+        description="Expand existing symbols and optionally attach authored meanings. Never draws cards.")
+    parser.add_argument("input", nargs="?", default="-", help="Saved spread JSON, or - for stdin")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--meanings-pack", help="Enable a validated major-arcana pack directory")
+    group.add_argument("--no-meanings", action="store_true", help="Disable DLC, overriding local defaults")
+    args = parser.parse_args()
     try:
+        if args.input == "-":
+            data = json.load(sys.stdin)
+        else:
+            with open(args.input, "r", encoding="utf-8") as f:
+                data = json.load(f)
         spread = normalize_spread_input(data)
-        result = unfold_spread(spread)
-    except ValueError as exc:
+        result = unfold_spread(spread, meanings_pack=False if args.no_meanings else args.meanings_pack)
+    except (ValueError, OSError) as exc:
         print(json.dumps({"error": str(exc)}, ensure_ascii=False, indent=2), file=sys.stderr)
         sys.exit(1)
     # 本脚本只产 Phase 3 属性【数据】，不是解读。把告示钉进输出 + stderr 横幅，
